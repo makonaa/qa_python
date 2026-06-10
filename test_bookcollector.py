@@ -81,33 +81,6 @@ class TestBooksCollector:
         collector.set_book_genre(title, genre)
         assert collector.get_book_genre(title) == genre
 
-    #TODO: решить как проверять этот метод и не имать мозги
-
-    # many_books_with_genres = [
-    #     [
-    #             ['fiction_book1','Фантастика'],
-    #             ['fiction_book2','Фантастика'],
-    #             ['fiction_book3','Фантастика']
-    #     ],
-    #     [
-    #             ['horror_book1','Ужасы'],
-    #             ['horror_book2','Ужасы']
-    #     ],
-    #     [
-    #             ['detective_book1','Детективы'],
-    #             ['detective_book2','Детективы'],
-    #             ['detective_book3','Детективы'],
-    #             ['detective_book4','Детективы']
-    #     ],
-    #     [
-    #             ['cartoon_book1','Мультфильмы'],
-    #     ],
-    #     [
-    #             ['comedy_book1','Комедии'],
-    #             ['comedy_book2','Комедии']
-    #     ]
-    #
-    # ]
     # 7 test:
     # ER:
     def test_get_books_with_specific_genre_all_genres_returned(self, books_with_genres, genres):
@@ -116,16 +89,84 @@ class TestBooksCollector:
             collector.add_new_book(book[0])
             collector.set_book_genre(name=book[0], genre=book[1])
         for genre in genres:
-            assert (len(collector.get_books_with_specific_genre(genre))
-                    == len(list(filter(lambda x:genre in x, books_with_genres))))
+            collection_length_actual = len(collector.get_books_with_specific_genre(genre))
+            collection_length_expected = len(list(filter(lambda x:genre in x, books_with_genres)))
+            assert collection_length_actual == collection_length_expected
 
     # 8 test:
     # ER:
-    def test_get_books_genre_all_genres_returned(self):
+    def test_get_books_genre_all_books_returned(self):
         collector = BooksCollector()
         collector.add_new_book('book1')
         collector.add_new_book('book2')
         collector.add_new_book('book3')
         assert len(collector.get_books_genre()) == len(collector.books_genre)
 
+    kids_books = [
+        ['kids_book1','Фантастика'],
+        ['kids_book2','Мультфильмы'],
+        ['kids_book3','Комедии'],
+    ]
+    # 9 test:
+    # ER:
+    @pytest.mark.parametrize('title, genre', kids_books)
+    def test_get_books_for_children_kids_only_return_all(self, title, genre):
+        collector = BooksCollector()
+        collector.add_new_book(title)
+        collector.set_book_genre(title, genre)
+        assert title in collector.get_books_for_children()
 
+    not_kids_books = [
+        ['not_kids_book1', 'Ужасы'],
+        ['not_kids_book2', 'Детективы']
+    ]
+
+    # 10 test:
+    # ER:
+    @pytest.mark.parametrize('title, genre', not_kids_books)
+    def test_get_books_for_children_not_kids_books_not_return(self, title, genre):
+        collector = BooksCollector()
+        collector.add_new_book(title)
+        collector.set_book_genre(title, genre)
+        assert title not in collector.get_books_for_children()
+
+    # test 11:
+    # ER:
+    def test_add_book_in_favorites_new_book_added(self):
+        collector = BooksCollector()
+        collector.add_new_book('favorite_book1')
+        collector.add_book_in_favorites('favorite_book1')
+        assert collector.favorites == ['favorite_book1']
+
+    # test 12:
+    # ER:
+    def test_add_book_in_favorites_present_book_not_added(self):
+        collector = BooksCollector()
+        collector.add_new_book('favorite_book1')
+        collector.add_book_in_favorites('favorite_book1')
+        collector.add_book_in_favorites('favorite_book1')
+        assert len(collector.favorites) == 1
+
+    # test 13:
+    # ER:
+    def test_add_book_in_favorites_missing_book_not_added(self):
+        collector = BooksCollector()
+        collector.add_book_in_favorites('favorite_book1')
+        assert collector.favorites == []
+
+    # test 14:
+    # ER:
+    def test_delete_book_from_favorites_present_book_deleted(self):
+        collector = BooksCollector()
+        collector.add_new_book('favorite_book1')
+        collector.add_book_in_favorites('favorite_book1')
+        collector.delete_book_from_favorites('favorite_book1')
+        assert collector.favorites == []
+
+    # test 15:
+    # ER:
+    def test_get_list_of_favorites_books_books_present_returned(self):
+        collector = BooksCollector()
+        collector.add_new_book('favorite_book1')
+        collector.add_book_in_favorites('favorite_book1')
+        assert collector.get_list_of_favorites_books() == collector.favorites
