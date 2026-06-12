@@ -1,5 +1,8 @@
 import pytest
 
+from main import BooksCollector
+
+
 @pytest.fixture(scope='session')
 def books_with_genres():
     return [
@@ -23,3 +26,7 @@ def books_with_genres():
 @pytest.fixture(scope='session')
 def genres():
     return ['Фантастика', 'Ужасы', 'Детективы', 'Мультфильмы', 'Комедии']
+
+@pytest.fixture
+def collector():
+    return BooksCollector()
