@@ -42,8 +42,8 @@ class TestBooksCollector:
         collector.add_new_book('Клуб убийств по четвергам')
         assert len(collector.books_genre) == 1
 
-    # test 3: set a book per valid genre
-    # ER: every valid genre is set for the book
+    # test 3: set a book with valid genre
+    # ER: valid genre is set for the book
     @pytest.mark.parametrize('title, genre', bcd.books)
     def test_set_book_genre_valid_genre_all_set(self, title, genre, collector):
         collector.add_new_book(title)
@@ -75,12 +75,12 @@ class TestBooksCollector:
     # test 7: filter existent books by valid genre
     # ER: only books with specified genres are returned from the dict of books with different genres
     @pytest.mark.parametrize('genre', bcd.genres)
-    def test_get_books_with_specific_genre_valid_genres_returned(self, books_with_genres, genre, collector):
-        for book in books_with_genres:
+    def test_get_books_with_specific_genre_valid_genres_returned(self, genre, collector):
+        for book in bcd.books_with_genres:
             collector.add_new_book(book[0])
             collector.set_book_genre(name=book[0], genre=book[1])
         actual_collection = collector.get_books_with_specific_genre(genre)
-        expected_collection = list(map(lambda x:x[0], filter(lambda x:genre in x, books_with_genres)))
+        expected_collection = list(map(lambda x:x[0], filter(lambda x:genre in x, bcd.books_with_genres)))
         assert actual_collection == expected_collection
 
     # test 8: get dict of books with books present
